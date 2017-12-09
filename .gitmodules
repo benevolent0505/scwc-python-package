@@ -1,0 +1,3 @@
+[submodule "scwc/scwc_base"]
+	path = scwc/scwc_base
+	url = git@github.com:tkub/scwc.git

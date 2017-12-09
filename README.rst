@@ -35,7 +35,7 @@ Install
 
 .. code-block:: shell
 
-   $ pip install https://github.com/benevolent0505/s-cwc-python-package
+   $ pip install git+https://github.com/benevolent0505/scwc-python-package
 
 
 Contribution

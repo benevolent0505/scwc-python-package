@@ -32,6 +32,7 @@ class SCWC(BaseEstimator, TransformerMixin):
         if not header:
             header = list(map(lambda x: 'L{}'.format(x + 1), range(X.shape[1])))
 
+        self.data_dtype = X.dtype
         data = np.concatenate((X, y.reshape(y.shape[0], 1)), axis=1)
         df = pd.DataFrame(data, columns=header + ['class'])
 
@@ -56,7 +57,7 @@ class SCWC(BaseEstimator, TransformerMixin):
         X = pd.read_csv('{}/{}'.format(self._file_dir, self._output_filename))
         self.selected_feature_names = list(X.columns)[:-1]
 
-        return X.values[:, :-1]
+        return np.array(X.values[:, :-1], dtype=self.data_dtype)
 
     def fit_transform(self, X, y, header=None):
         return self.fit(X, y, header).transform()

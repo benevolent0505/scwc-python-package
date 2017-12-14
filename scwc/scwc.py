@@ -11,7 +11,7 @@ from datetime import datetime
 
 class SCWC(BaseEstimator, TransformerMixin):
 
-    def __init__(self, sort='su', verbose=0):
+    def __init__(self, sort='mi', verbose=0):
         self._check_sort(sort)
 
         self.sort = sort

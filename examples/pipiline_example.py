@@ -18,10 +18,10 @@ X = wine.data
 y = wine.target
 names = wine.feature_names
 
-selector = SCWC(sort='su', verbose=1)
+selector = SCWC(sort='mi', verbose=1)
 X_selected = selector.fit_transform(X, y, header=names)
 
-pipe = Pipeline([('scaler', StandardScaler()),
+pipe = Pipeline([('scaler', StandardScaler(with_mean=False)),
                  ('esitomator', LogisticRegression(random_state=0))])
 
 scores = cross_val_score(pipe, X_selected, y, scoring='accuracy', cv=10, verbose=10)

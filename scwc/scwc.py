@@ -8,6 +8,9 @@ from sklearn.base import BaseEstimator, TransformerMixin
 
 from datetime import datetime
 
+from sklearn.datasets import load_svmlight_file
+from .utils import save_as_libsvm
+
 
 class SCWC(BaseEstimator, TransformerMixin):
 
@@ -16,28 +19,20 @@ class SCWC(BaseEstimator, TransformerMixin):
 
         self.sort = sort
         self.verbose = verbose
-        self.selected_feature_names = []
 
         self._scwc = '{}/scwc_base/bin/scwc_base.jar'.format(os.path.dirname(os.path.realpath(__file__)))
 
         timestamp = datetime.now().strftime('%s')
-        self._input_filename = 'input_{}.csv'.format(timestamp)
-        self._output_filename = 'selected_features_{}.csv'.format(timestamp)
+        self._input_filename = 'input_{}.libsvm'.format(timestamp)
+        self._output_filename = 'selected_features_{}.libsvm'.format(timestamp)
 
     def _check_sort(self, sort_measure):
         if sort_measure not in ['mi', 'su', 'icr', 'mcc']:
             os.exit(1)  # TODO: Exception
 
     def fit(self, X, y, header=None):
-        if not header:
-            header = list(map(lambda x: 'L{}'.format(x + 1), range(X.shape[1])))
-
-        self.data_dtype = X.dtype
-        data = np.concatenate((X, y.reshape(y.shape[0], 1)), axis=1)
-        df = pd.DataFrame(data, columns=header + ['class'])
-
         self._file_dir = os.getcwd()
-        df.to_csv(self._input_filename, index=False)
+        save_as_libsvm(X, y, self._input_filename)
 
         return self
 
@@ -54,10 +49,9 @@ class SCWC(BaseEstimator, TransformerMixin):
                   '{}/{}'.format(self._file_dir, self._output_filename)])
         subprocess.run(args=['rm', '{}/{}'.format(self._file_dir, self._input_filename)])
 
-        X = pd.read_csv('{}/{}'.format(self._file_dir, self._output_filename))
-        self.selected_feature_names = list(X.columns)[:-1]
+        X, _ = load_svmlight_file('{}/{}'.format(self._file_dir, self._output_filename))
 
-        return np.array(X.values[:, :-1], dtype=self.data_dtype)
+        return X.tolil()
 
     def fit_transform(self, X, y, header=None):
         return self.fit(X, y, header).transform()

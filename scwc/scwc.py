@@ -42,7 +42,7 @@ class SCWC(BaseEstimator, TransformerMixin):
             options = '{}v'.format(options)
 
         subprocess.run(
-            args=['java', '-jar', '-Xmx=8g', self._scwc,
+            args=['java', '-Xmx8g', '-jar', self._scwc,
                   '-s', self.sort,
                   options,
                   '{}/{}'.format(self._file_dir, self._input_filename),

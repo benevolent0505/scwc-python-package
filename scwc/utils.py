@@ -21,6 +21,7 @@ def _arr2libsvm(arr):
 
 def _sparse_arr2libsvm(arr):
     _, nonzero_indexes = arr.nonzero()
+    nonzero_indexes.sort()
     nonzero_values = [arr[0, i] for i in nonzero_indexes]
 
     return get_libsvm_str(nonzero_indexes, nonzero_values)

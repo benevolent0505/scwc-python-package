@@ -1,4 +1,5 @@
 import os
+from sys import exit
 import subprocess
 
 import pandas as pd
@@ -27,7 +28,7 @@ class SCWC(BaseEstimator, TransformerMixin):
 
     def _check_sort(self, sort_measure):
         if sort_measure not in ['mi', 'su', 'icr', 'mcc']:
-            os.exit(1)  # TODO: Exception
+            exit(1)  # TODO: Exception
 
     def fit(self, X, y, header=None):
         self._file_dir = os.getcwd()

@@ -8,8 +8,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 
 from datetime import datetime
 
-from sklearn.datasets import load_svmlight_file
-from .utils import save_as_libsvm
+from sklearn.datasets import dump_svmlight_file, load_svmlight_file
 
 
 class SCWC(BaseEstimator, TransformerMixin):
@@ -32,7 +31,7 @@ class SCWC(BaseEstimator, TransformerMixin):
 
     def fit(self, X, y, header=None):
         self._file_dir = os.getcwd()
-        save_as_libsvm(X, y, self._input_filename)
+        dump_svmlight_file(X, y, self._input_filename, zero_based=False)
 
         return self
 

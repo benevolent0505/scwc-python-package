@@ -2,9 +2,6 @@ import os
 from sys import exit
 import subprocess
 
-import pandas as pd
-import numpy as np
-
 from sklearn.base import BaseEstimator, TransformerMixin
 
 from datetime import datetime

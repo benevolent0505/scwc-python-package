@@ -16,11 +16,13 @@ class SCWC(BaseEstimator, TransformerMixin):
         self.sort_ = sort
         self.verbose = verbose
 
-        self._scwc = '{}/scwc_base/bin/scwc_base.jar'.format(os.path.dirname(os.path.realpath(__file__)))
+        cur_dir = os.path.dirname(os.path.realpath(__file__))
+        self._scwc = os.path.abspath('{}/scwc_base/bin/scwc_base.jar'.format(cur_dir))
 
         timestamp = datetime.now().strftime('%s')
         self._input_filename = 'input_{}.libsvm'.format(timestamp)
         self._output_filename = 'selected_features_{}.libsvm'.format(timestamp)
+        self._log_filename = 'selected_features_{}.log'.format(timestamp)
 
     def _check_sort(self, sort_measure):
         """Raises a ValueError if sort_measure is not known measure"""

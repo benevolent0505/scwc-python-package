@@ -34,12 +34,11 @@ if __name__ == '__main__':
     assemble_scwc()
 
     setup(name='scwc',
-          version='0.2.4',
+          version='0.3.0',
           packages=find_packages(),
           include_package_data=True,
           install_requires=[
-              'numpy',
+              'numpy>=1.12',
               'scipy',
-              'pandas',
               'scikit-learn'
           ])

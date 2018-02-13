@@ -1,6 +1,7 @@
 import os
 import subprocess
 
+import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 
 from datetime import datetime
@@ -39,6 +40,7 @@ class SCWC(BaseEstimator, TransformerMixin):
             subprocess.run(
                 args=['java', '-Xmx8g', '-jar', self._scwc,
                       '-s', self.sort_, options, inputfile, outputfile])
+            self._feature_size = X.shape[1]
             self._outputfile = os.path.abspath(outputfile)
         except subprocess.CalledProcessError:
             # output error log
@@ -56,8 +58,7 @@ class SCWC(BaseEstimator, TransformerMixin):
 
     def transform(self, X=None):
         if X is not None:
-            # check
-            X_selected = X[self.get_support()]
+            X_selected = X[:, self.get_support()]
         else:
             X_selected, _ = load_svmlight_file(self._outputfile)
             os.remove(self._outputfile)
@@ -68,7 +69,10 @@ class SCWC(BaseEstimator, TransformerMixin):
         return self.fit(X, y, header).transform()
 
     def get_support(self, indices=False):
-        pass
+        support = np.full(self._feature_size, False)
+        support[self._selected_indices] = True
+
+        return support if indices else self._selected_indices
 
     def _get_selected_indices(self, logfile):
         selected_indices = []
@@ -81,6 +85,6 @@ class SCWC(BaseEstimator, TransformerMixin):
                 continue
 
             selected_index = tmp_selected_index.strip('att_')
-            selected_indices.append(int(selected_index))
+            selected_indices.append(int(selected_index) - 1)  # to zero_based index
 
         return selected_indices

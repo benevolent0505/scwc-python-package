@@ -1,5 +1,4 @@
 import os
-from sys import exit
 import subprocess
 
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -14,7 +13,7 @@ class SCWC(BaseEstimator, TransformerMixin):
     def __init__(self, sort='mi', verbose=0):
         self._check_sort(sort)
 
-        self.sort = sort
+        self.sort_ = sort
         self.verbose = verbose
 
         self._scwc = '{}/scwc_base/bin/scwc_base.jar'.format(os.path.dirname(os.path.realpath(__file__)))
@@ -24,8 +23,9 @@ class SCWC(BaseEstimator, TransformerMixin):
         self._output_filename = 'selected_features_{}.libsvm'.format(timestamp)
 
     def _check_sort(self, sort_measure):
+        """Raises a ValueError if sort_measure is not known measure"""
         if sort_measure not in ['mi', 'su', 'icr', 'mcc']:
-            exit(1)  # TODO: Exception
+            raise ValueError('Unsupported sorting measure')
 
     def fit(self, X, y, header=None):
         self._file_dir = os.getcwd()

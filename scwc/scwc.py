@@ -30,27 +30,57 @@ class SCWC(BaseEstimator, TransformerMixin):
             raise ValueError('Unsupported sorting measure')
 
     def fit(self, X, y, header=None):
-        self._file_dir = os.getcwd()
         dump_svmlight_file(X, y, self._input_filename, zero_based=False)
+
+        options = '-vlo' if self.verbose > 0 else '-lo'
+        inputfile = '{}/{}'.format(os.getcwd(), self._input_filename)
+        outputfile = '{}/{}'.format(os.getcwd(), self._output_filename)
+        try:
+            subprocess.run(
+                args=['java', '-Xmx8g', '-jar', self._scwc,
+                      '-s', self.sort_, options, inputfile, outputfile])
+            self._outputfile = os.path.abspath(outputfile)
+        except subprocess.CalledProcessError:
+            # output error log
+            pass
+        finally:
+            os.remove(os.path.abspath(inputfile))
+
+        logfile = os.path.abspath('{}/{}'.format(os.getcwd(), self._log_filename))
+        with open(logfile, 'r') as log:
+            self._selected_indices = self._get_selected_indices(log)
+
+        os.remove(logfile)
 
         return self
 
     def transform(self, X=None):
-        options = '-o'
-        if self.verbose > 0:
-            options = '{}v'.format(options)
+        if X is not None:
+            # check
+            X_selected = X[self.get_support()]
+        else:
+            X_selected, _ = load_svmlight_file(self._outputfile)
+            os.remove(self._outputfile)
 
-        subprocess.run(
-            args=['java', '-Xmx8g', '-jar', self._scwc,
-                  '-s', self.sort,
-                  options,
-                  '{}/{}'.format(self._file_dir, self._input_filename),
-                  '{}/{}'.format(self._file_dir, self._output_filename)])
-        subprocess.run(args=['rm', '{}/{}'.format(self._file_dir, self._input_filename)])
-
-        X, _ = load_svmlight_file('{}/{}'.format(self._file_dir, self._output_filename))
-
-        return X.tolil()
+        return X_selected
 
     def fit_transform(self, X, y, header=None):
         return self.fit(X, y, header).transform()
+
+    def get_support(self, indices=False):
+        pass
+
+    def _get_selected_indices(self, logfile):
+        selected_indices = []
+        for line in logfile:
+            if line.startswith('#'):
+                continue
+
+            tmp_selected_index = line.split()[-1]
+            if tmp_selected_index in ('feature', 'patchedFeature'):
+                continue
+
+            selected_index = tmp_selected_index.strip('att_')
+            selected_indices.append(int(selected_index))
+
+        return selected_indices

@@ -81,7 +81,7 @@ class SCWC(BaseEstimator, TransformerMixin):
                 continue
 
             tmp_selected_index = line.split()[-1]
-            if tmp_selected_index in ('feature', 'patchedFeature'):
+            if tmp_selected_index in ('feature', 'patchFeature'):
                 continue
 
             selected_index = tmp_selected_index.strip('att_')

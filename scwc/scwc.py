@@ -14,7 +14,7 @@ class SCWC(BaseEstimator, TransformerMixin):
     def __init__(self, sort='mi', verbose=0):
         self._check_sort(sort)
 
-        self.sort_ = sort
+        self.sort = sort
         self.verbose = verbose
 
         cur_dir = os.path.dirname(os.path.realpath(__file__))
@@ -39,7 +39,7 @@ class SCWC(BaseEstimator, TransformerMixin):
         try:
             subprocess.run(
                 args=['java', '-Xmx8g', '-jar', self._scwc,
-                      '-s', self.sort_, options, inputfile, outputfile])
+                      '-s', self.sort, options, inputfile, outputfile])
             self._feature_size = X.shape[1]
             self._outputfile = os.path.abspath(outputfile)
         except subprocess.CalledProcessError:
